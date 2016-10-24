@@ -33,7 +33,8 @@ for i in range(0, len(queries), 20):
 
     url = 'http://octopart.com/api/v3/parts/match?queries=%s' \
         % urllib.quote(json.dumps(batched_queries))
-    url += '&apikey=REPLACE_ME'
+    #url += '&apikey=REPLACE_ME'
+    url += 'ce6096b2'
     data = urllib.urlopen(url).read()
     response = json.loads(data)
 
