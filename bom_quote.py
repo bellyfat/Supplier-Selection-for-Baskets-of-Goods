@@ -35,13 +35,19 @@ def import_bom(csvFileName = "arduino_bom.csv", toTest = False):
 		if not line_item['Part Number'] or not line_item['Manufacturer']:
 			continue
 		line_items.append(line_item)
+		# if toTest:
+			# print "toTest == True, line item is:", line_item, "\n"
 		queries.append({'mpn': line_item['Part Number'],
 						'brand': line_item['Manufacturer'],
 						'reference': len(line_items) - 1})
-	
+		
 	if toTest:
-		queries = queries[:1]	
-		print "\ntoTest == True, returning subset of queries:\n", queries
+		print ("\n\ntoTest = True in import_bom")
+		# return only a subset 
+		line_items = line_items[:1]
+		queries = queries[:1]
+		print ("\tline_items:", line_items)
+		print ("\tqueries:", queries)
 		#assert False
 
 	return line_items, queries	
@@ -49,7 +55,7 @@ def import_bom(csvFileName = "arduino_bom.csv", toTest = False):
 #line_items, queries = \
 #	import_bom(csvFileName = "arduino_bom.csv", toTest = True)
 
-def send_queries(queries):
+def send_queries(queries, toTest=False):
 	"""
 	Send queries to REST API for part matching.
 	
@@ -78,16 +84,24 @@ def send_queries(queries):
 		url += '&apikey=ce6096b2'
 		data = urllib.urlopen(url).read()
 		response = json.loads(data)
-		#print "response:", response
+		# print ("response:", response)
 
 		# Record results for analysis
 		results.extend(response['results'])
-	
+
+	if toTest:
+		print "\n\ntoTest == True in send_queries"
+		print "\tqueries sent = ", queries, "\n"
+		# print "\tresults:\n:"
+		# print results
+		from pprint import pprint
+		pprint (results)
+	assert False	
 	return results
 
 #results = send_queries(queries)
 
-def analyze(results, line_items):
+def analyze(results, line_items, toTest=False):
 	"""
 	Analyze results sent back by Octopart API
 
@@ -151,16 +165,17 @@ def analyze(results, line_items):
 	return itemsNotFound, itemsCount
 	
 if __name__ == '__main__':
-	toTest = True
 	line_items, queries = \
-		import_bom(csvFileName = "arduino_bom.csv", toTest = toTest)
+		import_bom(csvFileName = "arduino_bom.csv", toTest = True)
 	results = \
-		send_queries(queries)
-	itemsNotFound, itemsCount = \
-		analyze(results, line_items)
-	print "results[0][0]", results[0][0]
-	print "itemsNotFound:", itemsNotFound
-	print "itemsCount:", itemsCount
+		send_queries(queries, toTest = True)
+	
+	
+	# itemsNotFound, itemsCount = \
+		# analyze(results, line_items)
+	# print "results[0][0]", results[0][0]
+	# print "itemsNotFound:", itemsNotFound
+	# print "itemsCount:", itemsCount
 
 	
 	
